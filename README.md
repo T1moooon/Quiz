@@ -5,6 +5,7 @@
 ## Примеры ботов
 
 [VK бот](https://vk.com/club232680346)
+
 [TG бот](https://t.me/Timontester_bot)
 
 ## Установка и запуск
