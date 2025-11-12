@@ -41,7 +41,8 @@ def start(update: Update, context: CallbackContext) -> None:
 
 def handle_new_question_request(update: Update, context: CallbackContext) -> None:
     redis_client = context.bot_data['redis']
-    question = choice(load_all_questions(FOLDER_PATH))
+    questions = context.bot_data['questions']
+    question = choice(questions)
     user_id = update.effective_user.id
     redis_client.hset(f'user:{user_id}', mapping={
         'question': question['question'],
@@ -91,7 +92,9 @@ def run_tg_bot(redis_url, token):
     redis_client = redis.from_url(redis_url, decode_responses=True)
     updater = Updater(token=token, use_context=True)
     dispatcher = updater.dispatcher
+
     dispatcher.bot_data['redis'] = redis_client
+    dispatcher.bot_data['questions'] = load_all_questions(FOLDER_PATH)
 
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],

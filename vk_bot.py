@@ -36,8 +36,8 @@ def send_message(vk_api, user_id, message) -> None:
     )
 
 
-def handle_new_question_request(vk_api, redis_client, user_id) -> None:
-    question = choice(load_all_questions(FOLDER_PATH))
+def handle_new_question_request(vk_api, redis_client, user_id, questions) -> None:
+    question = choice(questions)
     redis_client.hset(
         f'user:{user_id}',
         mapping={'question': question['question'], 'answer': question['answer']},
@@ -66,7 +66,7 @@ def handle_solution_attempt(vk_api, redis_client, user_id, text) -> None:
         send_message(vk_api, user_id, 'Неправильно… Попробуешь ещё раз?')
 
 
-def handle_give_up(vk_api, redis_client, user_id) -> None:
+def handle_give_up(vk_api, redis_client, user_id, questions) -> None:
     db = redis_client.hgetall(f'user:{user_id}')
     answer = db.get('answer')
     if not answer:
@@ -75,11 +75,13 @@ def handle_give_up(vk_api, redis_client, user_id) -> None:
 
     send_message(vk_api, user_id, f'Правильный ответ: {answer}')
     redis_client.hdel(f'user:{user_id}', 'question', 'answer')
-    handle_new_question_request(vk_api, redis_client, user_id)
+    handle_new_question_request(vk_api, redis_client, user_id, questions)
 
 
 def vk_run_bot(redis_url, token):
     redis_client = redis.from_url(redis_url, decode_responses=True)
+
+    questions = load_all_questions(FOLDER_PATH)
 
     vk_session = vk.VkApi(token=token)
     vk_api = vk_session.get_api()
@@ -95,9 +97,9 @@ def vk_run_bot(redis_url, token):
             continue
 
         if text == Button.NEW_QUESTION.value:
-            handle_new_question_request(vk_api, redis_client, event.user_id)
+            handle_new_question_request(vk_api, redis_client, event.user_id, questions)
         elif text == Button.GIVE_UP.value:
-            handle_give_up(vk_api, redis_client, event.user_id)
+            handle_give_up(vk_api, redis_client, event.user_id, questions)
         else:
             handle_solution_attempt(vk_api, redis_client, event.user_id, text)
 
