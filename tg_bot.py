@@ -15,7 +15,7 @@ from telegram.ext import (
     ConversationHandler,
 )
 
-from quiz_utils import Button, DATA_DIR, load_all, normalize_text, strip_explanation
+from quiz_utils import Button, FOLDER_PATH, load_all_questions, normalize_text, strip_explanation
 
 
 class QuizState(Enum):
@@ -35,7 +35,7 @@ def start(update: Update, context: CallbackContext) -> None:
 
 def handle_new_question_request(update: Update, context: CallbackContext) -> None:
     redis_client = context.bot_data['redis']
-    question = choice(load_all(DATA_DIR))
+    question = choice(load_all_questions(FOLDER_PATH))
     user_id = update.effective_user.id
     redis_client.hset(f'user:{user_id}', mapping={
         'question': question['question'],

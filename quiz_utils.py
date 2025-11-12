@@ -3,7 +3,7 @@ from pathlib import Path
 from enum import Enum
 
 
-DATA_DIR = Path("quiz-questions")
+FOLDER_PATH = Path("quiz-questions")
 PATTERN = re.compile(
     r"Вопрос \d+:\s*(.*?)\nОтвет:\s*(.*?)(?=\n(?:[А-ЯЁ][^:\n]+:|Вопрос \d+:)|\Z)",
     re.S
@@ -43,7 +43,7 @@ def load_file(path: Path):
     return pairs
 
 
-def load_all(data_dir: Path):
+def load_all_questions(data_dir: Path):
     result = []
     for path in sorted(data_dir.glob("*.txt")):
         try:

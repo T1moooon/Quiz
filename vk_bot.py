@@ -10,7 +10,7 @@ from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 from vk_api.longpoll import VkEventType, VkLongPoll
 
 
-from quiz_utils import Button, DATA_DIR, load_all, normalize_text, strip_explanation
+from quiz_utils import Button, FOLDER_PATH, load_all_questions, normalize_text, strip_explanation
 
 
 def build_keyboard():
@@ -36,7 +36,7 @@ def _storage_key(user_id):
 
 
 def handle_new_question_request(vk_api, redis_client, user_id) -> None:
-    question = choice(load_all(DATA_DIR))
+    question = choice(load_all_questions(FOLDER_PATH))
     redis_client.hset(
         _storage_key(user_id),
         mapping={'question': question['question'], 'answer': question['answer']},
