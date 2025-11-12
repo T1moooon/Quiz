@@ -44,7 +44,7 @@ def handle_new_question_request(update: Update, context: CallbackContext) -> Non
     questions = context.bot_data['questions']
     question = choice(questions)
     user_id = update.effective_user.id
-    redis_client.hset(f'user:{user_id}', mapping={
+    redis_client.hset(f'tg:user:{user_id}', mapping={
         'question': question['question'],
         'answer': question['answer'],
         })
@@ -55,7 +55,7 @@ def handle_new_question_request(update: Update, context: CallbackContext) -> Non
 def handle_solution_attempt(update: Update, context: CallbackContext) -> None:
     redis_client = context.bot_data['redis']
     user_id = update.effective_user.id
-    storage_key = f'user:{user_id}'
+    storage_key = f'tg:user:{user_id}'
     db = redis_client.hgetall(storage_key)
 
     normalize_correct = normalize_text(strip_explanation(db.get('answer')))
@@ -75,7 +75,7 @@ def handle_solution_attempt(update: Update, context: CallbackContext) -> None:
 def handle_give_up(update: Update, context: CallbackContext) -> None:
     redis_client = context.bot_data['redis']
     user_id = update.effective_user.id
-    storage_key = f'user:{user_id}'
+    storage_key = f'tg:user:{user_id}'
     db = redis_client.hgetall(storage_key)
     answer = db.get('answer')
 
