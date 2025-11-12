@@ -36,21 +36,17 @@ def send_message(vk_api, user_id, message) -> None:
     )
 
 
-def _storage_key(user_id):
-    return f'user:{user_id}'
-
-
 def handle_new_question_request(vk_api, redis_client, user_id) -> None:
     question = choice(load_all_questions(FOLDER_PATH))
     redis_client.hset(
-        _storage_key(user_id),
+        f'user:{user_id}',
         mapping={'question': question['question'], 'answer': question['answer']},
     )
     send_message(vk_api, user_id, question['question'])
 
 
 def handle_solution_attempt(vk_api, redis_client, user_id, text) -> None:
-    db = redis_client.hgetall(_storage_key(user_id))
+    db = redis_client.hgetall(f'user:{user_id}')
     correct_answer = db.get('answer')
     if not correct_answer:
         send_message(vk_api, user_id, 'Сначала запроси вопрос кнопкой «Новый вопрос».')
@@ -60,7 +56,7 @@ def handle_solution_attempt(vk_api, redis_client, user_id, text) -> None:
     normalized_user = normalize_text(strip_explanation(text))
 
     if normalized_user == normalized_correct:
-        redis_client.hdel(_storage_key(user_id), 'question', 'answer')
+        redis_client.hdel(f'user:{user_id}', 'question', 'answer')
         send_message(
             vk_api,
             user_id,
@@ -71,14 +67,14 @@ def handle_solution_attempt(vk_api, redis_client, user_id, text) -> None:
 
 
 def handle_give_up(vk_api, redis_client, user_id) -> None:
-    db = redis_client.hgetall(_storage_key(user_id))
+    db = redis_client.hgetall(f'user:{user_id}')
     answer = db.get('answer')
     if not answer:
         send_message(vk_api, user_id, 'Нет активного вопроса. Нажми «Новый вопрос».')
         return
 
     send_message(vk_api, user_id, f'Правильный ответ: {answer}')
-    redis_client.hdel(_storage_key(user_id), 'question', 'answer')
+    redis_client.hdel(f'user:{user_id}', 'question', 'answer')
     handle_new_question_request(vk_api, redis_client, user_id)
 
 
