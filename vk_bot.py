@@ -9,8 +9,13 @@ from dotenv import load_dotenv
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 from vk_api.longpoll import VkEventType, VkLongPoll
 
-
-from quiz_utils import Button, FOLDER_PATH, load_all_questions, normalize_text, strip_explanation
+from quiz_utils import (
+    FOLDER_PATH,
+    Button,
+    load_all_questions,
+    normalize_text,
+    strip_explanation,
+)
 
 
 def build_keyboard():

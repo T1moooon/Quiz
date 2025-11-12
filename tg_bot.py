@@ -1,21 +1,27 @@
 import logging
 import os
-from random import choice
 from enum import Enum, auto
+from random import choice
 
 import redis
 from dotenv import load_dotenv
-from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
+from telegram import KeyboardButton, ReplyKeyboardMarkup, Update
 from telegram.ext import (
     CallbackContext,
     CommandHandler,
+    ConversationHandler,
     Filters,
     MessageHandler,
     Updater,
-    ConversationHandler,
 )
 
-from quiz_utils import Button, FOLDER_PATH, load_all_questions, normalize_text, strip_explanation
+from quiz_utils import (
+    FOLDER_PATH,
+    Button,
+    load_all_questions,
+    normalize_text,
+    strip_explanation,
+)
 
 
 class QuizState(Enum):

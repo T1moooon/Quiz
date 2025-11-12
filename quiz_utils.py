@@ -1,7 +1,6 @@
 import re
-from pathlib import Path
 from enum import Enum
-
+from pathlib import Path
 
 FOLDER_PATH = Path("quiz-questions")
 PATTERN = re.compile(
